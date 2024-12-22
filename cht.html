@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ably Chat Test</title>
+  <script src="https://cdn.ably.io/lib/ably.js"></script>
+</head>
+<body>
+  <h1>Test Ably Chat</h1>
+  <input type="text" id="username" placeholder="Enter your username" />
+  <textarea id="message" placeholder="Enter your message"></textarea>
+  <button id="send">Send</button>
+  <div id="messages"></div>
+
+  <script>
+    const apiKey = 'A0U0PQ.abMsKQ:nwShEI-ufoCxGcngQDCdzBuYI51d6z6CcNhYR61Obxg';
+    const channelName = 'chat-channel'; // Use any channel name you'd like
+    const usernameInput = document.getElementById('username');
+    const messageInput = document.getElementById('message');
+    const sendButton = document.getElementById('send');
+    const messagesDiv = document.getElementById('messages');
+
+    // Initialize Ably
+    const ably = new Ably.Realtime({ key: apiKey });
+    const channel = ably.channels.get(channelName);
+
+    // Function to display messages
+    function displayMessage(message) {
+      const messageDiv = document.createElement('div');
+      messageDiv.textContent = `${message.data.username}: ${message.data.text}`;
+      messagesDiv.appendChild(messageDiv);
+    }
+
+    // Listen for messages on the channel
+    channel.subscribe((message) => {
+      displayMessage(message);
+    });
+
+    // Send a message when the button is clicked
+    sendButton.addEventListener('click', () => {
+      const username = usernameInput.value.trim();
+      const text = messageInput.value.trim();
+
+      if (username && text) {
+        // Publish the message to the Ably channel
+        channel.publish('chat', { username, text });
+
+        // Clear the input fields after sending the message
+        messageInput.value = '';
+      }
+    });
+  </script>
+</body>
+</html>
+
+
